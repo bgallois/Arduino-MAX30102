@@ -1,8 +1,9 @@
 /*
-Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta
+(gupta.shivam1996@gmail.com)
 
-Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
-All alogrithms and methods used are from the above author,
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans
+<x@brainrapers.org> All alogrithms and methods used are from the above author,
 I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
@@ -28,56 +29,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "CircularBuffer.h"
 #include "MAX30102_Registers.h"
 
-#define DEFAULT_MODE                MAX30102_MODE_HRONLY
-#define DEFAULT_SAMPLING_RATE       MAX30102_SAMPRATE_100HZ
-#define DEFAULT_PULSE_WIDTH         MAX30102_SPC_PW_118US_16BITS
-#define DEFAULT_RED_LED_CURRENT     0xff
-#define DEFAULT_IR_LED_CURRENT      0xff
-#define DEFAULT_ADC_RANGE			MAX30102_ADCRange_8192
-//Max30102 part ID is 0x15
-#define EXPECTED_PART_ID            0x15
-//Max30102 fifo size is 32
-#define RINGBUFFER_SIZE             32
+#define DEFAULT_AVERAGE MAX30102_SMP_AVE_1
+#define DEFAULT_MODE MAX30102_MODE_HRONLY
+#define DEFAULT_SAMPLING_RATE MAX30102_SAMPRATE_100HZ
+#define DEFAULT_PULSE_WIDTH MAX30102_SPC_PW_118US_16BITS
+#define DEFAULT_RED_LED_CURRENT 0xff
+#define DEFAULT_IR_LED_CURRENT 0xff
+#define DEFAULT_ADC_RANGE MAX30102_ADCRange_8192
+// Max30102 part ID is 0x15
+#define EXPECTED_PART_ID 0x15
+// Max30102 fifo size is 32
+#define RINGBUFFER_SIZE 32
 
-#define I2C_BUS_SPEED               400000UL
+#define I2C_BUS_SPEED 400000UL
 
 typedef struct {
-    uint16_t ir;
-    uint16_t red;
+  uint16_t ir;
+  uint16_t red;
 } SensorReadout;
 
 class MAX30102 {
-public:
-    MAX30102();
-    bool begin();
-    void setMode(Mode mode);
-    void setLedsPulseWidth(LEDPulseWidth ledPulseWidth);
-    void setSamplingRate(SamplingRate samplingRate);
-	void setRangeADC(ADCRange adcRange);
-	void setRedLedCurrent(uint8_t redLedCurrent);
-	void setIRLedCurrent(uint8_t IRLedCurrent);
-    void setSlot1(SlotSetting slotsetting);
-	void setSlot2(SlotSetting slotsetting);
-	void setSlot3(SlotSetting slotsetting);
-	void setSlot4(SlotSetting slotsetting);
-    void setHighresModeEnabled(bool enabled);
-    void update();
-    bool getRawValues(uint16_t *ir, uint16_t *red);
-    void resetFifo();
-    void startTemperatureSampling();
-    bool isTemperatureReady();
-    float retrieveTemperature();
-    void shutdown();
-    void resume();
-    uint8_t getPartId();
+ public:
+  MAX30102();
+  bool begin();
+  void setMode(Mode mode);
+  void setSampleAverage(SampleAverage average);
+  void setLedsPulseWidth(LEDPulseWidth ledPulseWidth);
+  void setSamplingRate(SamplingRate samplingRate);
+  void setRangeADC(ADCRange adcRange);
+  void setRedLedCurrent(uint8_t redLedCurrent);
+  void setIRLedCurrent(uint8_t IRLedCurrent);
+  void setSlot1(SlotSetting slotsetting);
+  void setSlot2(SlotSetting slotsetting);
+  void setSlot3(SlotSetting slotsetting);
+  void setSlot4(SlotSetting slotsetting);
+  void setHighresModeEnabled(bool enabled);
+  void update();
+  bool getRawValues(uint16_t *ir, uint16_t *red);
+  void resetFifo();
+  void startTemperatureSampling();
+  bool isTemperatureReady();
+  float retrieveTemperature();
+  void shutdown();
+  void resume();
+  uint8_t getPartId();
 
-private:
-    CircularBuffer<SensorReadout, RINGBUFFER_SIZE> readoutsBuffer;
+ private:
+  CircularBuffer<SensorReadout, RINGBUFFER_SIZE> readoutsBuffer;
 
-    uint8_t readRegister(uint8_t address);
-    void writeRegister(uint8_t address, uint8_t data);
-    void burstRead(uint8_t baseAddress, uint8_t *buffer, uint8_t length);
-    void readFifoData();
+  uint8_t readRegister(uint8_t address);
+  void writeRegister(uint8_t address, uint8_t data);
+  void burstRead(uint8_t baseAddress, uint8_t *buffer, uint8_t length);
+  void readFifoData();
 };
 
 #endif
